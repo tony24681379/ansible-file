@@ -1,0 +1,8 @@
+---
+- name: add docker group to host
+  hosts: swarm
+  sudo: True
+
+  tasks:
+    - name: add docker group to host
+      user: name={{ansible_ssh_user}} shell=/bin/bash groups=docker append=yes

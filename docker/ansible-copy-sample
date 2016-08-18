@@ -1,0 +1,1 @@
+ansible all -s -m copy -a "src=docker-config/daemon.json dest=/etc/docker/daemon.json"
