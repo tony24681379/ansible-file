@@ -1,0 +1,17 @@
+---
+- name: stop docker service
+  service: state=stopped name=docker
+
+- name: copy docker systemd file
+  copy:
+    src: ../files/docker.service.d
+    dest: /etc/systemd/system
+
+- name: update systemd-daemon
+  command: systemctl daemon-reload
+
+- name: enable systemd
+  service:
+    name: docker.service
+    enabled: yes
+    state: started
