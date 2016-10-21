@@ -1,0 +1,21 @@
+---
+- name: copy systemd configuration
+  template:
+    src: etcd.service
+    dest: /lib/systemd/system
+- debug:
+    msg: >
+      {{inventory_hostname}}
+      {% for host in groups['node'] %}
+      {% if loop.first %}
+      etcd{{loop.index}}={{hostvars[host]['ansible_eth1']['ipv4']['address']}}
+      {% else %}
+      ,etcd{{loop.index}}={{hostvars[host]['ansible_eth1']['ipv4']['address']}}
+      {% endif %}
+      {% endfor %}
+
+- name: update systemd-daemon
+  command: systemctl daemon-reload
+
+- name: enable systemd etcd
+  command: systemctl enable etcd 

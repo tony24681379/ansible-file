@@ -1,0 +1,26 @@
+[Unit]
+Description=Etcd
+Documentation=https://coreos.com/etcd/docs/latest/
+After=network.target docker.socket
+Requires=docker.socket
+
+[Service]
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker stop etcd
+ExecStartPre=-/usr/bin/docker rm -f etcd
+ExecStartPre=-/usr/bin/docker pull quay.io/coreos/etcd:v2.3.7
+ExecStart=/usr/bin/docker run -p 4001:4001 -p 2380:2380 -p 2379:2379 \
+ --name etcd quay.io/coreos/etcd:v2.3.7 \
+ -name {{inventory_hostname}} \
+ -advertise-client-urls http://{{ansible_eth1.ipv4.address}}:2379,http://{{ansible_eth1.ipv4.address}}:4001 \
+ -listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001 \
+ -initial-advertise-peer-urls http://{{ansible_eth1.ipv4.address}}:2380 \
+ -listen-peer-urls http://0.0.0.0:2380 \
+ -initial-cluster-token etcd-cluster-1 \
+ -initial-cluster {% for host in groups['node'] %}{% if loop.first %}{{hostvars[host]['inventory_hostname']}}=http://{{hostvars[host]['ansible_eth1']['ipv4']['address']}}:2380{% else %},{{hostvars[host]['inventory_hostname']}}=http://{{hostvars[host]['ansible_eth1']['ipv4']['address']}}:2380{% endif %}{% endfor %} \
+ -initial-cluster-state new
+ExecStop=/usr/bin/docker stop etcd
+ExecStopPost=-/usr/bin/docker rm -f etcd
+
+[Install]
+WantedBy=multi-user.target
