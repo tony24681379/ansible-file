@@ -5,7 +5,7 @@
 - name: copy docker systemd file
   copy:
     src: ../files/docker.service.d
-    dest: /etc/systemd/system
+    dest: /lib/systemd/system
 
 - name: update systemd-daemon
   command: systemctl daemon-reload
