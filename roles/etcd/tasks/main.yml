@@ -1,8 +1,8 @@
 ---
 - name: copy systemd configuration
   template:
-    src: etcd.service
-    dest: /lib/systemd/system
+    src: etcd.service.j2
+    dest: /lib/systemd/system/etcd.service
 - debug:
     msg: >
       {{inventory_hostname}}
@@ -17,5 +17,14 @@
 - name: update systemd-daemon
   command: systemctl daemon-reload
 
+- name: disable systemd etcd
+  command: systemctl disable etcd
+
 - name: enable systemd etcd
-  command: systemctl enable etcd 
+  command: systemctl enable etcd
+
+- name: stop etcd service
+  command: systemctl stop etcd
+
+- name: start etcd service
+  command: systemctl start etcd

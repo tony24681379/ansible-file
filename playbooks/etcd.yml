@@ -2,4 +2,4 @@
 - hosts: node
   become: yes
   roles:
-    - etcd
+    - { role: etcd, etcd_version: '2.3.7' }
